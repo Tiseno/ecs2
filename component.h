@@ -4,14 +4,16 @@
 
 #include "ansi.h"
 
-struct Vec3 {
+struct Vec {
 	float x, y;
 };
 
 struct Position {
-	Vec3 pos;
+	Vec pos;
 	static std::string NAME;
 };
+
+std::string Position::NAME = "Position";
 
 std::ostream &operator<<(std::ostream &os, Position const& m) {
 	return os << ANSI::YELLOW << Position::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
@@ -24,14 +26,48 @@ std::ostream &operator<<(std::ostream &os, Position const* m) {
 	return os << *m;
 }
 
-std::string Position::NAME = "Position";
-
-
-
-struct Velocity {
-	Vec3 pos;
+struct Size {
+	Vec pos;
 	static std::string NAME;
 };
+
+std::string Size::NAME = "Size";
+
+std::ostream &operator<<(std::ostream &os, Size const& m) {
+	return os << ANSI::YELLOW << Size::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+}
+
+std::ostream &operator<<(std::ostream &os, Size const* m) {
+	if (m == nullptr) {
+		return os << ANSI::GRAY << Size::NAME << "{INVALID}" << ANSI::RESET;
+	}
+	return os << *m;
+}
+
+struct Acceleration {
+	Vec pos;
+	static std::string NAME;
+};
+
+std::string Acceleration::NAME = "Acceleration";
+
+std::ostream &operator<<(std::ostream &os, Acceleration const& m) {
+	return os << ANSI::YELLOW << Acceleration::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+}
+
+std::ostream &operator<<(std::ostream &os, Acceleration const* m) {
+	if (m == nullptr) {
+		return os << ANSI::GRAY << Acceleration::NAME << "{INVALID}" << ANSI::RESET;
+	}
+	return os << *m;
+}
+
+struct Velocity {
+	Vec pos;
+	static std::string NAME;
+};
+
+std::string Velocity::NAME = "Velocity";
 
 std::ostream &operator<<(std::ostream &os, Velocity const& m) {
 	return os << ANSI::YELLOW << Velocity::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
@@ -43,6 +79,4 @@ std::ostream &operator<<(std::ostream &os, Velocity const* m) {
 	}
 	return os << *m;
 }
-
-std::string Velocity::NAME = "Velocity";
 
