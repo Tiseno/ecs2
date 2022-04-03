@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "ansi.h"
+#include "../ansi.h"
 
 struct Vec {
 	float x, y;

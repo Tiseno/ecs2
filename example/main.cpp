@@ -1,10 +1,10 @@
-#include "module/sparse_set/sparse_set.h"
+#include "../module/sparse_set/sparse_set.h"
 
 #include <iostream>
 
-#include "components.h"
-#include "entities.h"
-#include "ecs.h"
+#include "../components.h"
+#include "../entities.h"
+#include "../ecs.h"
 
 #include "component.h"
 
