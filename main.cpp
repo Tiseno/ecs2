@@ -4,22 +4,23 @@
 
 #include "components.h"
 #include "entities.h"
+#include "ecs.h"
 
 #include "component.h"
 
-struct Systems {
-
-};
+float rf(int min, int max) {
+	return (float)(min + (rand() % (max - min)));
+}
 
 Entity createRandomEntity(Entities& entities, Components& components) {
 	Entity e = entities.create();
-	components.assign(e.index, Position{0, 0});
-	if(rand() % 100 < 80)
-		components.assign(e.index, Size{0, 0});
-	if(rand() % 100 < 50)
-		components.assign(e.index, Velocity{0, 0});
+	components.assign(e.index, Position{rf(-100, 100), rf(-100, 100)});
 	if(rand() % 100 < 10)
-		components.assign(e.index, Acceleration{0, 0});
+		components.assign(e.index, Size{1, 1});
+	if(rand() % 100 < 10)
+		components.assign(e.index, Velocity{rf(-10, 10)/10, rf(-10, 10)/10});
+	if(rand() % 100 < 10)
+		components.assign(e.index, Acceleration{rf(-10, 10)/10, rf(-10, 10)/10});
 	return e;
 }
 
@@ -36,17 +37,57 @@ void removeRandomEntity(Entities& entities, Components& components) {
 	removeAllComponentsFromEntity(e, components);
 }
 
-int main() {
-	Entities entities;
-	Components components;
-
-	while(true){
+struct CreateEntitiesSystem : System<float> {
+	CreateEntitiesSystem() : System{"CreateEntitiesSystem"} {}
+	void update(Entities& entities, Components& components, float time) override {
 		createRandomEntity(entities, components);
 		createRandomEntity(entities, components);
-
 		removeRandomEntity(entities, components);
-
-		std::cout << "There are now " << entities.size() << " entities!\n";
 	}
+};
+
+struct UpdatePositionSystem : System<float> {
+	UpdatePositionSystem() : System{"UpdatePositionSystem"} {}
+	void update(Entities& entities, Components& components, float time) override {
+		if (!components.hasPool<Velocity>()
+				|| !components.hasPool<Position>()
+				|| !components.hasPool<Acceleration>()) {
+			std::cout << "Not all pools are initialized yet!\n";
+			return;
+		}
+		auto p = components.getPool<Velocity>();
+		auto dkfj = p->sparseSet.dense;
+		for(auto& ssd : components.getPool<Velocity>()->sparseSet.dense) {
+			auto velocity = &ssd.data;
+			auto position = components.get<Position>(ssd.index);
+			auto acceleration = components.get<Acceleration>(ssd.index);
+			if(position != nullptr && acceleration != nullptr) {
+				std::cout << "UpdatePositionSystem iteration " << ssd << "\n";
+				velocity->vec.x += acceleration->vec.x; // *time
+				velocity->vec.y += acceleration->vec.y;
+				position->vec.x += velocity->vec.x;
+				position->vec.y += velocity->vec.y;
+				std::cout << "\tUpdated " << position << " and " << velocity << " using " << acceleration << "\n";
+			}
+		}
+	}
+};
+
+int main() {
+	ECS<float> ecs;
+	ecs.systems.push_back(new CreateEntitiesSystem());
+	ecs.systems.push_back(new UpdatePositionSystem());
+
+	size_t i = 0;
+	while(++i < 1000){
+		std::cout <<"############################################\n";
+		std::cout <<"############################################\n";
+		std::cout <<"############################################\n";
+		std::cout <<"############################################\n";
+		std::cout <<"############################################\n";
+		std::cout <<"############################################\n";
+		ecs.update(1);
+	}
+	std::cout << "There are now " << ecs.entities.size() << " entities!\n";
 	return 0;
 }

@@ -102,43 +102,53 @@ struct Components {
 			componentPools[id<Component>()] = (void*)newPool;
 			std::cout << ANSI::RED << "new " << ANSI::RESET << *newPool << "\n";
 		}
-
-		auto cp = ((ComponentPool<Component>*)componentPools[id<Component>()])->assign(index, init);
-		std::cout << ANSI::GREEN_DARK << "assign " << ANSI::RESET << cp << " to " << index << "\n";
-		return cp;
+		auto c = getPool<Component>()->assign(index, init);
+		// std::cout << ANSI::GREEN_DARK << "assign " << ANSI::RESET << c << " to " << index << "\n";
+		return c;
 	}
 
 	template<typename Component>
 	Component* get(size_t index) {
-		auto cp = (static_cast<ComponentPool<Component>*>(componentPools[id<Component>()]))->get(index);
-		std::cout << ANSI::GREEN_DARK << "get " << ANSI::RESET << cp << " for " << index << "\n";
-		return cp;
+		if (hasPool<Component>()) {
+			auto c = getPool<Component>()->get(index);
+			// std::cout << ANSI::GREEN_DARK << "get " << ANSI::RESET << c << " for " << index << "\n";
+			return c;
+		}
+		return nullptr;
+	}
+
+	template<typename Component>
+	bool hasPool() {
+		return id<Component>() < componentPools.size() && componentPools[id<Component>()] != nullptr;
 	}
 
 	template<typename Component>
 	void remove(size_t index) {
-
-		std::cout << ANSI::GREEN_DARK << "remove " << ANSI::RESET << Component::NAME << " from " << index << "\n";
-		auto pool = getPool<Component>();
-		if (pool == nullptr) {
-			return;
+		// std::cout << ANSI::GREEN_DARK << "remove " << ANSI::RESET << Component::NAME << " from " << index << "\n";
+		if(hasPool<Component>()) {
+			getPool<Component>()->remove(index);
 		}
-		pool->remove(index);
 	}
 
 	template<typename Component>
 	ComponentPool<Component>* getPool() {
-		if (id<Component>() >= componentPools.size()) {
-			return nullptr;
+		if (hasPool<Component>()) {
+			return static_cast<ComponentPool<Component>*>(componentPools[id<Component>()]);
 		}
-		return static_cast<ComponentPool<Component>*>(componentPools[id<Component>()]);
+		return nullptr;
 	}
 
 	template<typename Component>
 	size_t size() {
-		if (getPool<Component>() == nullptr) {
-			return 0;
+		if (hasPool<Component>()) {
+			return getPool<Component>()->sparseSet.dense.size();
 		}
-		return getPool<Component>()->sparseSet.dense.size();
+		return 0;
 	}
+
+	// template<typename Component...>
+	// bool hasPools() {
+	// 	// Check all pools
+	// 	return id<Component>() < componentPools.size();
+	// }
 };

@@ -9,14 +9,14 @@ struct Vec {
 };
 
 struct Position {
-	Vec pos;
+	Vec vec;
 	static std::string NAME;
 };
 
 std::string Position::NAME = "Position";
 
 std::ostream &operator<<(std::ostream &os, Position const& m) {
-	return os << ANSI::YELLOW << Position::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+	return os << ANSI::YELLOW << Position::NAME << "{" << m.vec.x << " " << m.vec.y << "}" << ANSI::RESET;
 }
 
 std::ostream &operator<<(std::ostream &os, Position const* m) {
@@ -27,14 +27,14 @@ std::ostream &operator<<(std::ostream &os, Position const* m) {
 }
 
 struct Size {
-	Vec pos;
+	Vec vec;
 	static std::string NAME;
 };
 
 std::string Size::NAME = "Size";
 
 std::ostream &operator<<(std::ostream &os, Size const& m) {
-	return os << ANSI::YELLOW << Size::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+	return os << ANSI::YELLOW << Size::NAME << "{" << m.vec.x << " " << m.vec.y << "}" << ANSI::RESET;
 }
 
 std::ostream &operator<<(std::ostream &os, Size const* m) {
@@ -45,14 +45,14 @@ std::ostream &operator<<(std::ostream &os, Size const* m) {
 }
 
 struct Acceleration {
-	Vec pos;
+	Vec vec;
 	static std::string NAME;
 };
 
 std::string Acceleration::NAME = "Acceleration";
 
 std::ostream &operator<<(std::ostream &os, Acceleration const& m) {
-	return os << ANSI::YELLOW << Acceleration::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+	return os << ANSI::YELLOW << Acceleration::NAME << "{" << m.vec.x << " " << m.vec.y << "}" << ANSI::RESET;
 }
 
 std::ostream &operator<<(std::ostream &os, Acceleration const* m) {
@@ -63,14 +63,14 @@ std::ostream &operator<<(std::ostream &os, Acceleration const* m) {
 }
 
 struct Velocity {
-	Vec pos;
+	Vec vec;
 	static std::string NAME;
 };
 
 std::string Velocity::NAME = "Velocity";
 
 std::ostream &operator<<(std::ostream &os, Velocity const& m) {
-	return os << ANSI::YELLOW << Velocity::NAME << "{" << m.pos.x << " " << m.pos.y << "}" << ANSI::RESET;
+	return os << ANSI::YELLOW << Velocity::NAME << "{" << m.vec.x << " " << m.vec.y << "}" << ANSI::RESET;
 }
 
 std::ostream &operator<<(std::ostream &os, Velocity const* m) {
