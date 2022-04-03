@@ -24,9 +24,9 @@ std::ostream &operator<<(std::ostream &os, Entity const& m) {
 	if (m.index == INVALID_ENTITY_INDEX) {
 		os << "INVALID";
 	} else {
-		os << m.index;
+		os << "#" << m.index;
 	}
-	return os << " " << m.version << "}" << ANSI::RESET;
+	return os << " v" << m.version << "}" << ANSI::RESET;
 }
 
 struct Entities {
