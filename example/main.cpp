@@ -39,7 +39,7 @@ void removeRandomEntity(Entities& entities, Components& components) {
 
 struct CreateEntitiesSystem : System<float> {
 	CreateEntitiesSystem() : System{"CreateEntitiesSystem"} {}
-	void update(Entities& entities, Components& components, float time) override {
+	void update(Entities& entities, Components& components, float& time) override {
 		createRandomEntity(entities, components);
 		createRandomEntity(entities, components);
 	}
@@ -47,7 +47,7 @@ struct CreateEntitiesSystem : System<float> {
 
 struct UpdatePositionSystem : System<float> {
 	UpdatePositionSystem() : System{"UpdatePositionSystem"} {}
-	void update(Entities& entities, Components& components, float time) override {
+	void update(Entities& entities, Components& components, float& time) override {
 		if (!components.hasPool<Velocity>()
 				|| !components.hasPool<Position>()
 				|| !components.hasPool<Acceleration>()) {
@@ -74,7 +74,7 @@ struct UpdatePositionSystem : System<float> {
 struct RemoveEntitiesSystem : System<float> {
 	size_t i = 0;
 	RemoveEntitiesSystem() : System{"RemoveEntitiesSystem"} {}
-	void update(Entities& entities, Components& components, float time) override {
+	void update(Entities& entities, Components& components, float& time) override {
 		i++;
 		if(i % 21 == 0) {
 			std::cout << "There are " << entities.size() << " entities\n";
@@ -95,7 +95,8 @@ int main() {
 	ecs.systems.push_back(new UpdatePositionSystem());
 
 	while(ecs.entities.size() < 100) {
-		ecs.update(1);
+		float time = 1;
+		ecs.update(time);
 	}
 
 	for(auto e : ecs.entities.entities) {

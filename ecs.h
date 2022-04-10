@@ -9,7 +9,7 @@ template<typename SystemArg>
 struct System {
 	std::string name;
 	System(std::string const& _name) : name(_name) {}
-	virtual void update(Entities& entities, Components& components, SystemArg arg) = 0;
+	virtual void update(Entities& entities, Components& components, SystemArg& arg) = 0;
 };
 
 template<typename SystemArg>
@@ -18,7 +18,7 @@ struct ECS {
 	Components components;
 	std::vector<System<SystemArg>*> systems;
 
-	void update(SystemArg arg) {
+	void update(SystemArg& arg) {
 		for(auto s : systems) {
 			s->update(entities, components, arg);
 		}
