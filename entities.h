@@ -56,6 +56,9 @@ struct Entities {
 	}
 
 	Entity getRandom() {
+		if(entities.size() == 0) {
+			return Entity{INVALID_ENTITY_INDEX, 0};
+		}
 		auto i = rand() % entities.size();
 		// Return the first valid found in any direction from the random index
 		for(int j = i; j >= 0; j--) {
@@ -68,7 +71,7 @@ struct Entities {
 				return entities[j];
 			}
 		}
-		return entities[0];
+		return Entity{INVALID_ENTITY_INDEX, 0};
 	}
 
 	size_t size() {
