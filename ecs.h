@@ -24,7 +24,15 @@ struct ECS {
 		}
 	}
 
-	// TODO remove(Entity e)
-	// TODO entitiesWithComponents<C1, C2, ...>()
+	bool removeEntity(Entity e) {
+		if (entities.remove(e)) {
+			components.removeAll(e.index);
+			return true;
+		}
+		return false;
+	}
+
+	// TODO createEntity<Components...>(Components...);
+	// TODO entitiesWithComponents<Components...>()
 };
 

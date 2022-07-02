@@ -47,12 +47,17 @@ struct Entities {
 		}
 	}
 
-	void remove(Entity e) {
-		if (!e.isValid() || entities[e.index].version != e.version) {
-			return;
+	bool isValid(Entity e) {
+		return e.index < entities.size() && e.index != INVALID_ENTITY_INDEX && entities[e.index].index != INVALID_ENTITY_INDEX && entities[e.index].version == e.version;
+	}
+
+	bool remove(Entity e) {
+		if (isValid(e)) {
+			entities[e.index].index = INVALID_ENTITY_INDEX;
+			freeEntityIndexes.push_back(e.index);
+			return true;
 		}
-		entities[e.index].index = INVALID_ENTITY_INDEX;
-		freeEntityIndexes.push_back(e.index);
+		return false;
 	}
 
 	Entity getRandom() {
@@ -62,12 +67,12 @@ struct Entities {
 		auto i = rand() % entities.size();
 		// Return the first valid found in any direction from the random index
 		for(int j = i; j >= 0; j--) {
-			if(entities[j].isValid()) {
+			if(isValid(entities[j])) {
 				return entities[j];
 			}
 		}
 		for(size_t j = i; j < entities.size(); j++) {
-			if(entities[j].isValid()) {
+			if(isValid(entities[j])) {
 				return entities[j];
 			}
 		}
