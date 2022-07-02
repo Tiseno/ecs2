@@ -32,7 +32,13 @@ struct ECS {
 		return false;
 	}
 
-	// TODO createEntity<Components...>(Components...);
+	template<typename... Components>
+	Entity createEntity(Components... args) {
+		Entity e = entities.create();
+		(components.assign(e.index, args), ...);
+		return e;
+	}
+
 	// TODO entitiesWithComponents<Components...>()
 };
 
