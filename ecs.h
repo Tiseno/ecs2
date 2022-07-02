@@ -23,5 +23,8 @@ struct ECS {
 			s->update(entities, components, arg);
 		}
 	}
+
+	// TODO remove(Entity e)
+	// TODO entitiesWithComponents<C1, C2, ...>()
 };
 

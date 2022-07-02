@@ -76,6 +76,7 @@ std::ostream &operator<<(std::ostream &os, ComponentPool<Component> const& m) {
 		<< Component::NAME
 		<< " " << humanReadableBytes(m.memoryUsage())
 		<< " #" << m.sparseSet.dense.size()
+		<< " #" << m.sparseSet.sparse.size()
 		<< "}" << ANSI::RESET;
 }
 
@@ -87,13 +88,17 @@ std::ostream &operator<<(std::ostream &os, ComponentPool<Component> const* m) {
 	return os << *m;
 }
 
+struct Components;
+typedef void (Components::*RemoveFnPtrType)(size_t);
+
 struct Components {
 	std::vector<void*> componentPools;
+	std::vector<RemoveFnPtrType> componentPoolRemovers;
 
 	Components() {}
 
 	template<typename Component>
-	Component* assign(size_t index, Component const& init) {
+	void registerComponent() {
 		if (componentPools.size() <= id<Component>()) {
 			componentPools.resize(id<Component>() + 1, nullptr);
 		}
@@ -101,7 +106,21 @@ struct Components {
 			ComponentPool<Component>* newPool = new ComponentPool<Component>();
 			componentPools[id<Component>()] = (void*)newPool;
 			std::cout << ANSI::RED << "new " << ANSI::RESET << *newPool << "\n";
+			RemoveFnPtrType fp = &Components::remove<Component>;
+			componentPoolRemovers.push_back(fp);
+			std::cout << ANSI::RED << "new " << ANSI::RESET << "remover for " << Component::NAME << " " << fp << " " << &fp << "\n";
 		}
+	}
+
+	void removeAll(size_t index) {
+		for(auto fp : componentPoolRemovers) {
+			((*this).*fp)(index);
+		}
+	}
+
+	template<typename Component>
+	Component* assign(size_t index, Component const& init) {
+		registerComponent<Component>();
 		auto c = getPool<Component>()->assign(index, init);
 		// std::cout << ANSI::GREEN_DARK << "assign " << ANSI::RESET << c << " to " << index << "\n";
 		return c;

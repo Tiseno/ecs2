@@ -24,17 +24,14 @@ Entity createRandomEntity(Entities& entities, Components& components) {
 	return e;
 }
 
-void removeAllComponentsFromEntity(Entity e, Components& components) {
-	components.remove<Position>(e.index);
-	components.remove<Size>(e.index);
-	components.remove<Velocity>(e.index);
-	components.remove<Acceleration>(e.index);
-}
-
 void removeRandomEntity(Entities& entities, Components& components) {
 	Entity e = entities.getRandom();
 	entities.remove(e);
-	removeAllComponentsFromEntity(e, components);
+	// TODO this should not be used with index generally
+	// In this case we know that the entity is a valid living entity
+	// As we used getRandom but otherwise we should query for the entity
+	// or implement ecs.remove(e) instead
+	components.removeAll(e.index);
 }
 
 struct CreateEntitiesSystem : System<float> {
