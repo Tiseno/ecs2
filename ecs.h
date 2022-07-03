@@ -6,10 +6,13 @@
 #include "entities.h"
 
 template<typename SystemArg>
+struct ECS;
+
+template<typename SystemArg>
 struct System {
 	std::string name;
 	System(std::string const& _name) : name(_name) {}
-	virtual void update(Entities& entities, Components& components, SystemArg& arg) = 0;
+	virtual void update(ECS<SystemArg>& ecs, SystemArg& systemArg) = 0;
 };
 
 template<typename SystemArg>
@@ -25,7 +28,7 @@ struct ECS {
 
 	void update(SystemArg& arg) {
 		for(auto s : systems) {
-			s->update(entities, components, arg);
+			s->update(*this, arg);
 		}
 	}
 

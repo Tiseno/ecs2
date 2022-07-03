@@ -12,51 +12,45 @@ float rf(int min, int max) {
 	return (float)(min + (rand() % (max - min)));
 }
 
-Entity createRandomEntity(Entities& entities, Components& components) {
-	Entity e = entities.create();
-	components.assign(e.index, Position{rf(-100, 100), rf(-100, 100)});
+Entity createRandomEntity(ECS<float>& ecs) {
+	Entity e = ecs.createEntity(Position{rf(-100, 100), rf(-100, 100)});
 	if(rand() % 100 < 50)
-		components.assign(e.index, Size{1, 1});
+		ecs.components.assign(e.index, Size{1, 1});
 	if(rand() % 100 < 50)
-		components.assign(e.index, Velocity{rf(-10, 10)/10, rf(-10, 10)/10});
+		ecs.components.assign(e.index, Velocity{rf(-10, 10)/10, rf(-10, 10)/10});
 	if(rand() % 100 < 50)
-		components.assign(e.index, Acceleration{rf(-10, 10)/10, rf(-10, 10)/10});
+		ecs.components.assign(e.index, Acceleration{rf(-10, 10)/10, rf(-10, 10)/10});
 	return e;
 }
 
-void removeRandomEntity(Entities& entities, Components& components) {
-	Entity e = entities.getRandom();
-	entities.remove(e);
-	// TODO this should not be used with index generally
-	// In this case we know that the entity is a valid living entity
-	// As we used getRandom but otherwise we should query for the entity
-	// or implement ecs.remove(e) instead
-	components.removeAll(e.index);
+void removeRandomEntity(ECS<float>& ecs) {
+	Entity e = ecs.entities.getRandom();
+	ecs.removeEntity(e);
 }
 
 struct CreateEntitiesSystem : System<float> {
 	CreateEntitiesSystem() : System{"CreateEntitiesSystem"} {}
-	void update(Entities& entities, Components& components, float& time) override {
-		createRandomEntity(entities, components);
-		createRandomEntity(entities, components);
+	void update(ECS<float>& ecs, float& time) override {
+		createRandomEntity(ecs);
+		createRandomEntity(ecs);
 	}
 };
 
 struct UpdatePositionSystem : System<float> {
 	UpdatePositionSystem() : System{"UpdatePositionSystem"} {}
-	void update(Entities& entities, Components& components, float& time) override {
-		if (!components.hasPool<Velocity>()
-				|| !components.hasPool<Position>()
-				|| !components.hasPool<Acceleration>()) {
+	void update(ECS<float>& ecs, float& time) override {
+		if (!ecs.components.hasPool<Velocity>()
+				|| !ecs.components.hasPool<Position>()
+				|| !ecs.components.hasPool<Acceleration>()) {
 			return;
 		}
-		auto p = components.getPool<Velocity>();
+		auto p = ecs.components.getPool<Velocity>();
 		auto dkfj = p->sparseSet.dense;
 		auto count = 0;
-		for(auto& ssd : components.getPool<Velocity>()->sparseSet.dense) {
+		for(auto& ssd : ecs.components.getPool<Velocity>()->sparseSet.dense) {
 			auto velocity = &ssd.data;
-			auto position = components.get<Position>(ssd.index);
-			auto acceleration = components.get<Acceleration>(ssd.index);
+			auto position = ecs.components.get<Position>(ssd.index);
+			auto acceleration = ecs.components.get<Acceleration>(ssd.index);
 			if(position != nullptr && acceleration != nullptr) {
 				count++;
 				velocity->vec.x += acceleration->vec.x * time;
@@ -71,16 +65,16 @@ struct UpdatePositionSystem : System<float> {
 struct RemoveEntitiesSystem : System<float> {
 	size_t i = 0;
 	RemoveEntitiesSystem() : System{"RemoveEntitiesSystem"} {}
-	void update(Entities& entities, Components& components, float& time) override {
+	void update(ECS<float>& ecs, float& time) override {
 		i++;
 		if(i % 21 == 0) {
-			std::cout << "There are " << entities.size() << " entities\n";
-			size_t r = rand() % (int)(entities.size());
+			std::cout << "There are " << ecs.entities.size() << " entities\n";
+			size_t r = rand() % (int)(ecs.entities.size());
 			for(size_t j = 0; j < r; j++) {
-				removeRandomEntity(entities, components);
+				removeRandomEntity(ecs);
 			}
 			std::cout << ANSI::RED << "Removed " << r << " entities!\n" << ANSI::RESET;
-			std::cout << "There are now " << entities.size() << " entities!\n";
+			std::cout << "There are now " << ecs.entities.size() << " entities!\n";
 		}
 	}
 };
