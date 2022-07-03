@@ -28,8 +28,10 @@ std::ostream &operator<<(std::ostream &os, Entity const& m) {
 struct Entities {
 	std::vector<Entity> entities;
 	std::vector<EntityIndex> freeEntityIndexes;
+	long long entity_counter = 0;
 
 	Entity create() {
+		entity_counter++;
 		if (freeEntityIndexes.size() > 0) {
 			EntityIndex index = freeEntityIndexes.back();
 			freeEntityIndexes.pop_back();
