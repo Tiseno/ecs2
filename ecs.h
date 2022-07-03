@@ -18,6 +18,11 @@ struct ECS {
 	Components components;
 	std::vector<System<SystemArg>*> systems;
 
+	System<SystemArg>* addSystem(System<SystemArg>* system) {
+		systems.push_back(system);
+		return system;
+	}
+
 	void update(SystemArg& arg) {
 		for(auto s : systems) {
 			s->update(entities, components, arg);

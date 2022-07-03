@@ -13,11 +13,7 @@ const EntityIndex INVALID_ENTITY_INDEX(-1);
 struct Entity {
 	EntityIndex index;
 	EntityVersion version;
-
-	bool isValid() const {
-		return index != INVALID_ENTITY_INDEX;
-	}
-};
+} InvalidEntity{INVALID_ENTITY_INDEX, 0};
 
 std::ostream &operator<<(std::ostream &os, Entity const& m) {
 	os << ANSI::MAGENTA << "Entity{";
@@ -47,6 +43,17 @@ struct Entities {
 		}
 	}
 
+	bool isValidIndex(EntityIndex i) {
+		return i < entities.size() && isValid(entities[i]);
+	}
+
+	Entity getByIndex(EntityIndex i) {
+		if (isValidIndex(i)) {
+			return entities[i];
+		}
+		return InvalidEntity;
+	}
+
 	bool isValid(Entity e) {
 		return e.index < entities.size() && e.index != INVALID_ENTITY_INDEX && entities[e.index].index != INVALID_ENTITY_INDEX && entities[e.index].version == e.version;
 	}
@@ -62,7 +69,7 @@ struct Entities {
 
 	Entity getRandom() {
 		if(entities.size() == 0) {
-			return Entity{INVALID_ENTITY_INDEX, 0};
+			return InvalidEntity;
 		}
 		auto i = rand() % entities.size();
 		// Return the first valid found in any direction from the random index
@@ -76,7 +83,7 @@ struct Entities {
 				return entities[j];
 			}
 		}
-		return Entity{INVALID_ENTITY_INDEX, 0};
+		return InvalidEntity;
 	}
 
 	size_t size() {
